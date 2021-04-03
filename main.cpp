@@ -96,24 +96,3 @@ TEST_CASE("unwrap as")
     CHECK(base);
     CHECK(base.error() == "No such file or directory (2)");
 }
-
-TEST_CASE("if_ok")
-{
-    auto [v, err] = errors::try_then<int>(open_file("testdata/42.txt", "r"), [](FILE* f) {
-        return errors::try_then<int>(read_file(f), [](const std::string& content) { return to_int(content); });
-    });
-    CHECK(not err);
-    CHECK(v == 42);
-
-    auto [v1, err1] = errors::try_then<int>(open_file("testdata/1.txt", "r"), [](FILE* f) {
-        return errors::try_then<int>(read_file(f), [](const std::string& content) { return to_int(content); });
-    });
-    CHECK(err1);
-    CHECK(err1.error() == "No such file or directory (2)");
-
-    auto [v2, err2] = errors::try_then<int>(open_file("testdata/toto.txt", "r"), [](FILE* f) {
-        return errors::try_then<int>(read_file(f), [](const std::string& content) { return to_int(content); });
-    });
-    CHECK(err2);
-    CHECK(err2.error() == "stoi: no conversion");
-}

@@ -102,21 +102,4 @@ Err format(std::string_view fmt, Args&&... args)
     return make<Err>(buffer.data());
 }
 
-template<typename T, error E = basic_error, typename U, error R, typename Then>
-std::tuple<T, E> try_then(const std::tuple<U, R>& result, Then&& func)
-{
-    E err;
-
-    auto [res, errRes] = result;
-    if (errRes) {
-        static T defaultT{};
-        as(errRes, err);
-        return { defaultT, err };
-    }
-    auto [v, errF] = func(res);
-
-    as(errF, err);
-    return { v, err };
-}
-
 } // namespace errors
