@@ -52,34 +52,6 @@ std::tuple<FILE*, fs::path_error<>> open_file(std::string_view path, std::string
     return { f, {} };
 }
 
-std::tuple<std::string, errors::basic_error> read_file(FILE* f)
-{
-    constexpr size_t buffer_size = 8192;
-    std::string buffer;
-    buffer.resize(buffer_size);
-
-    errno = 0;
-    std::fread(buffer.data(), sizeof(char), buffer_size, f);
-    if (errno != 0) {
-        return { {}, errno_err() };
-    }
-
-    return { buffer, {} };
-}
-
-std::tuple<int, errors::basic_error> to_int(const std::string& s)
-{
-    try {
-        const auto v = std::stoi(s);
-        if (v == 0 && (s.empty() || s[0] != '0')) {
-            return { 0, errors::format("stoi %s: not an integer", s.data()) };
-        }
-        return { v, {} };
-    } catch (const std::exception& e) {
-        return { 0, { e.what() } };
-    }
-}
-
 TEST_CASE("unwrap as")
 {
     auto [f42, err42] = open_file("testdata/42.txt", "r");
